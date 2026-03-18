@@ -14,7 +14,7 @@ class Trustmybot < Formula
         TOOL_BIN="$(uv tool dir --bin 2>/dev/null || echo "$HOME/.local/bin")"
         if [ ! -x "$TOOL_BIN/bro" ]; then
           echo "  Installing trustmybot v#{version}..."
-          uv tool install "trustmybot==#{version}"
+          uv tool install --python 3.13 "trustmybot==#{version}"
         fi
         if [ ! -x "$TOOL_BIN/#{cmd}" ]; then
           echo "Error: trustmybot installation failed. Try manually: uv tool install trustmybot"
