@@ -8,21 +8,28 @@ class Trustmybot < Formula
   depends_on "uv"
 
   def install
-    # Install trustmybot into a dedicated venv managed by Homebrew
-    venv = libexec/"venv"
-    system "uv", "venv", "--python", "3.13", venv.to_s
-    system venv/"bin/pip", "install", "trustmybot==#{version}"
-
-    # Create wrapper scripts that use the venv's Python
+    # Create wrapper scripts that install on first run via uv tool
     %w[bot bro tmb].each do |cmd|
       (bin/cmd).write <<~BASH
         #!/bin/bash
-        exec "#{venv}/bin/#{cmd}" "$@"
+        # Ensure trustmybot is installed via uv tool
+        if ! command -v "$(uv tool dir --bin 2>/dev/null)/bro" >/dev/null 2>&1; then
+          echo "  Installing trustmybot v#{version}..."
+          uv tool install "trustmybot==#{version}" >/dev/null 2>&1
+        fi
+        exec "$(uv tool dir --bin 2>/dev/null)/#{cmd}" "$@"
       BASH
     end
   end
 
+  def caveats
+    <<~EOS
+      trustmybot is managed by uv. On first run, it will install
+      into uv's tool directory. Run `bro --version` to verify.
+    EOS
+  end
+
   test do
-    assert_match "Trust Me Bro", shell_output("#{bin}/bro --version")
+    assert_match version.to_s, shell_output("#{bin}/bro --version", 0)
   end
 end
