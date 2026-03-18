@@ -1,4 +1,6 @@
 class Trustmybot < Formula
+  include Language::Python::Virtualenv
+
   desc "Multi-agent workflow engine for industrial-grade software projects"
   homepage "https://github.com/ZaxShen/TMB"
   url "https://files.pythonhosted.org/packages/f1/08/e791964af6b3d2f86a7a9401889b454b1e2c5e5b94b2f3d7e38aebc8a60d/trustmybot-0.5.3.tar.gz"
