@@ -1,20 +1,25 @@
 class Trustmybot < Formula
-  include Language::Python::Virtualenv
-
   desc "Multi-agent workflow engine for industrial-grade software projects"
   homepage "https://github.com/ZaxShen/TMB"
-  url "https://files.pythonhosted.org/packages/f1/08/e791964af6b3d2f86a7a9401889b454b1e2c5e5b94b2f3d7e38aebc8a60d/trustmybot-0.5.3.tar.gz"
-  sha256 "0773507693fc0f2654c562f421902c564902e14e2fa2ebe0bb2cf3a16038722b"
+  url "https://github.com/ZaxShen/TMB/archive/refs/tags/v0.5.3.tar.gz"
+  sha256 :no_check
   license "AGPL-3.0-only"
 
-  depends_on "python@3.13"
+  depends_on "uv"
 
   def install
-    virtualenv_create(libexec, "python3.13")
-    system libexec/"bin/pip", "install", "trustmybot==#{version}"
-    bin.install_symlink libexec/"bin/bot"
-    bin.install_symlink libexec/"bin/bro"
-    bin.install_symlink libexec/"bin/tmb"
+    # Install trustmybot into a dedicated venv managed by Homebrew
+    venv = libexec/"venv"
+    system "uv", "venv", "--python", "3.13", venv.to_s
+    system venv/"bin/pip", "install", "trustmybot==#{version}"
+
+    # Create wrapper scripts that use the venv's Python
+    %w[bot bro tmb].each do |cmd|
+      (bin/cmd).write <<~BASH
+        #!/bin/bash
+        exec "#{venv}/bin/#{cmd}" "$@"
+      BASH
+    end
   end
 
   test do
