@@ -8,24 +8,27 @@ class Trustmybot < Formula
   depends_on "uv"
 
   def install
-    # Create wrapper scripts that install on first run via uv tool
     %w[bot bro tmb].each do |cmd|
       (bin/cmd).write <<~BASH
         #!/bin/bash
-        # Ensure trustmybot is installed via uv tool
-        if ! command -v "$(uv tool dir --bin 2>/dev/null)/bro" >/dev/null 2>&1; then
+        TOOL_BIN="$(uv tool dir --bin 2>/dev/null || echo "$HOME/.local/bin")"
+        if [ ! -x "$TOOL_BIN/bro" ]; then
           echo "  Installing trustmybot v#{version}..."
-          uv tool install "trustmybot==#{version}" >/dev/null 2>&1
+          uv tool install "trustmybot==#{version}"
         fi
-        exec "$(uv tool dir --bin 2>/dev/null)/#{cmd}" "$@"
+        if [ ! -x "$TOOL_BIN/#{cmd}" ]; then
+          echo "Error: trustmybot installation failed. Try manually: uv tool install trustmybot"
+          exit 1
+        fi
+        exec "$TOOL_BIN/#{cmd}" "$@"
       BASH
     end
   end
 
   def caveats
     <<~EOS
-      trustmybot is managed by uv. On first run, it will install
-      into uv's tool directory. Run `bro --version` to verify.
+      On first run, trustmybot will be installed via `uv tool install`.
+      Run `bro --version` to verify.
     EOS
   end
 
