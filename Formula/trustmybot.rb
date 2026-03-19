@@ -1,8 +1,8 @@
 class Trustmybot < Formula
   desc "Multi-agent workflow engine for industrial-grade software projects"
   homepage "https://github.com/ZaxShen/TMB"
-  url "https://github.com/ZaxShen/TMB/archive/refs/tags/v0.5.7.tar.gz"
-  sha256 "5f48c8b59c5f7ff54481cf254fad40430bcf5fd73488b0b87545ec17c56b5f58"
+  url "https://github.com/ZaxShen/TMB/archive/refs/tags/v0.5.8.tar.gz"
+  sha256 "bae4bf3bc353f233b3a618de6d579ce8fdbb289dd695a40bd2fe4830f0ef75ca"
   license "AGPL-3.0-only"
 
   depends_on "uv"
