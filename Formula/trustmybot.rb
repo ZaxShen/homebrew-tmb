@@ -12,9 +12,13 @@ class Trustmybot < Formula
       (bin/cmd).write <<~BASH
         #!/bin/bash
         TOOL_BIN="$(uv tool dir --bin 2>/dev/null || echo "$HOME/.local/bin")"
-        if [ ! -x "$TOOL_BIN/bro" ]; then
-          echo "  Installing trustmybot v#{version}..."
-          uv tool install --python 3.13 "trustmybot==#{version}"
+        WANT="#{version}"
+        if [ -x "$TOOL_BIN/bro" ]; then
+          GOT=$("$TOOL_BIN/bro" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+        fi
+        if [ "${GOT:-}" != "$WANT" ]; then
+          echo "  Installing trustmybot v${WANT}..."
+          uv tool install --python 3.13 --force "trustmybot==${WANT}"
         fi
         if [ ! -x "$TOOL_BIN/#{cmd}" ]; then
           echo "Error: trustmybot installation failed. Try manually: uv tool install trustmybot"
